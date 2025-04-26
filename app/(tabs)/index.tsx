@@ -1,13 +1,13 @@
-// app/(tabs)/index.tsx
 import { View, Text, Button } from "react-native";
-import { useAuth } from "@/context/AuthContext";
+import { useAuthStore } from "@/stores/authStore";
 
-export default function Home() {
-  const { logout } = useAuth();
+export default function HomeScreen() {
+  const { user, logout } = useAuthStore();
 
   return (
     <View style={{ padding: 24 }}>
-      <Text style={{ marginBottom: 12 }}>Welcome! You're logged in 🎉</Text>
+      <Text style={{ marginBottom: 12 }}>Welcome, {user?.name}!</Text>
+      <Button title="Logout" onPress={logout} />
     </View>
   );
 }

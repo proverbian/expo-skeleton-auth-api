@@ -1,75 +1,47 @@
-// app/(auth)/login.tsx
-import { useState } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet } from 'react-native';
-import { useAuth } from '@/context/AuthContext';
-import { BaseURL } from '@/api';
-
+import { View, TextInput, Button, Text, StyleSheet, Alert } from "react-native";
+import { useState } from "react";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter } from "expo-router";
 
 export default function LoginScreen() {
-  const { login } = useAuth();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("shiloh");
+  const [password, setPassword] = useState("Passw0rd1");
+  const { login } = useAuthStore();
+  const router = useRouter();
 
   const handleLogin = async () => {
     try {
-
-      console.log(BaseURL);
-
-      const res = await fetch(BaseURL   + '/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.token) {
-        await login(data.token);
-      } else {
-        Alert.alert('Login failed', data.message || 'Invalid credentials');
-      }
-    } catch (e) {
-      Alert.alert('Error', 'Something went wrong');
+      await login(username, password);
+      router.replace("/"); // go to tabs
+    } catch (err) {
+      Alert.alert("Login failed", "Check credentials.");
     }
   };
 
   return (
     <View style={styles.container}>
-      <TextInput style={styles.TextInput} placeholder="Username" value={username} onChangeText={setUsername} />
-      <TextInput style={styles.TextInput} placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} />
+      <Text style={styles.title}>Login</Text>
+      <TextInput style={styles.input} value={username} onChangeText={setUsername} placeholder="Email" />
+      <TextInput
+        style={styles.input}
+        value={password}
+        secureTextEntry
+        onChangeText={setPassword}
+        placeholder="Password"
+      />
       <Button title="Login" onPress={handleLogin} />
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    height:40,
-  },
-  TextInput: {
-    height: 40,
-    borderColor: 'gray',
+  container: { flex: 1, justifyContent: "center", padding: 20 },
+  title: { fontSize: 24, marginBottom: 16 },
+  input: {
+    borderColor: "#ccc",
     borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-  },
-  loginButton: {
-    backgroundColor: 'blue',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  loginButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    borderRadius: 5,
+    padding: 12,
+    marginBottom: 12,
+    borderRadius: 6,
   },
 });

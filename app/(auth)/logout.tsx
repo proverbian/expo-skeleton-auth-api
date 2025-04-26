@@ -1,15 +1,10 @@
 import { StyleSheet, Image, Platform, View, Text, Button } from "react-native";
-
-import { Collapsible } from "@/components/Collapsible";
-import { ExternalLink } from "@/components/ExternalLink";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useAuth } from "@/context/AuthContext";
+//import { useAuth } from "@/context/AuthContext";
+import { useUserStore } from "@/stores/userStore";
 
 export default function TabTwoScreen() {
-  const { logout } = useAuth();
+//  const { logout } = useAuth();
+const { logout } = useUserStore();
 
   return (
     <View style={{ padding: 24, flex: 1, justifyContent: "center", alignItems: "center" }}>

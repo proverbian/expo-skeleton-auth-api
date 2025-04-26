@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "624274795709",
+    "project_id": "hss-app-f5515",
+    "storage_bucket": "hss-app-f5515.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:624274795709:android:60ad939265a7741a491bd4",
+        "android_client_info": {
+          "package_name": "com.hss.mobileapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChEPM15UrT3u1UB_ZSy5nODBv461bquNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

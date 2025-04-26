@@ -1,43 +1,32 @@
 // app/_layout.tsx
-import { Stack, useRouter, useSegments } from 'expo-router';
-import { useEffect } from 'react';
-import { AuthProvider, useAuth } from '@/context/AuthContext';
-import { ActivityIndicator, View } from 'react-native';
+import { useEffect } from "react";
+import { Slot, useRouter } from "expo-router";
+import { ActivityIndicator, View } from "react-native";
+import { useAuthStore } from "@/stores/authStore";
 
-const AuthGate = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  const segments = useSegments();
+export default function RootLayout() {
+  const { user, loading, fetchUser } = useAuthStore();
   const router = useRouter();
 
-  const inAuthGroup = segments[0] === '(auth)';
+  useEffect(() => {
+    fetchUser(); // 👈 Fetch user unconditionally
+  }, []);
 
   useEffect(() => {
-    if (isAuthenticated === null) return;
-
-    if (!isAuthenticated && !inAuthGroup) {
-      router.replace('/(auth)/login');
-    } else if (isAuthenticated && inAuthGroup) {
-      router.replace('/(tabs)');
+    if (!loading) {
+      // Redirect logic when loading completes
+      if (!user) router.replace("/login");
+      else router.replace("/"); // Or your home screen
     }
-  }, [isAuthenticated, segments]);
+  }, [loading, user]);
 
-  if (isAuthenticated === null) {
+  if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" />
       </View>
     );
   }
 
-  return children;
-};
-
-export default function RootLayout() {
-  return (
-    <AuthProvider>
-      <AuthGate>
-        <Stack screenOptions={{ headerShown: false }} />
-      </AuthGate>
-    </AuthProvider>
-  );
+  return <Slot />;
 }
