@@ -1,56 +1,71 @@
-import { create } from "zustand";
-import api from "@/api";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { persistConfig } from './PersistConfig'; // relative import
+import api from '@/api';
 
-type AuthState = {
+interface AuthState {
   token: string | null;
-  user: any;
+  user: any | null; // Replace `any` with a specific type if you know the structure of the user object
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+}
+
+interface AuthActions {
+  setToken: (token: string | null) => void;
+  login: (username: string, password: string) => Promise<void>;
+  logout: () => Promise<void>; 
+  setUser: (user: any | null) => void; // Replace `any` with a specific type if you know the structure of the user object
   fetchUser: () => Promise<void>;
-};
+}
 
-export const useAuthStore = create<AuthState>((set, get) => ({
-  token: null,
-  user: null,
-  loading: true,
+export const useAuthStore = create<AuthState & AuthActions>()(
+  persist(
+    (set, get) => ({
+      token: null,
+      user: null,
+      loading: true,
+      setToken: (token) => set({ token }),
+      setUser: (user) => set({ user }),
+      login: async (username: string, password: string) => {
+        try {
+          api.post('/login', { username, password })
+            .then((response) => {
+              const { token, user } = response.data;
+              set({ token, user, loading: false });
+              // Optionally, you can also call fetchUser here if needed
+              // get().fetchUser();
+            })
+            .catch((error) => {
+              console.error('Login error:', error);
+              set({ token: null, user: null, loading: false });
+            });
+        } catch (e) {
+          console.error('Login error:', e);
+          set({ token: null, user: null, loading: false });
+        }
+      },
+      logout: async () => {
+        try {
+         // await api.post('/logout');
+          set({ token: null, user: null, loading: false });
+        } catch (e) {
+          console.error('Logout error:', e);
+          set({ token: null, user: null, loading: false });
+        }
+      },
+      fetchUser: async () => {
+        const token = get().token;
+        if (!token) {
+          set({ user: null, loading: false });
+          return;
+        }
 
-  login: async (username, password) => {
-    const res = await api.post("/login", { username, password });
-    const token = res.data.token;
-
-    api.defaults.headers.common.Authorization = `Bearer ${token}`;
-
-    const userRes = await api.get("/me");
-
-    set({
-      token,
-      user: userRes.data,
-      loading: false,
-    });
-  },
-
-  logout: () => {
-    api.defaults.headers.common.Authorization = "";
-    set({ token: null, user: null, loading: false });
-  },
-
-  // stores/authStore.tsx
-fetchUser: async () => {
-    const token = get().token;
-    
-    // Immediately set loading to false if no token exists
-    if (!token) {
-      set({ user: null, loading: false }); // 👈 Set both user and loading
-      return;
-    }
-  
-    try {
-      api.defaults.headers.common.Authorization = `Bearer ${token}`;
-      const res = await api.get("/me");
-      set({ user: res.data, loading: false });
-    } catch (error) {
-      set({ user: null, loading: false }); // 👈 Ensure error case updates loading
-    }
-  },
-}));
+        try {
+          // your API logic here
+        } catch (e) {
+          set({ user: null, loading: false });
+        }
+      },
+    }),
+    persistConfig
+  )
+);
