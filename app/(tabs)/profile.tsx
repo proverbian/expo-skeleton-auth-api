@@ -1,14 +1,14 @@
-import { StyleSheet, Image, Platform} from 'react-native';
+import { TextInput, View, Button, Text, StyleSheet, Image, Platform} from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import { useEffect, useState } from 'react';
-import { useUserStore } from '@/stores/userStore';
+import { useAuthStore } from '@/stores/authStore';
+import api from '@/api';
 
 export default function Profile() {
 
-  const { user, fetchUser } = useUserStore();
+  const { user } = useAuthStore();
 
   return (
     <ParallaxScrollView
